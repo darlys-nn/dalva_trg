@@ -6,9 +6,8 @@ export const Services: React.FC = () => {
   return (
     <section id="metodo" className="py-24 bg-stone-50 scroll-mt-24">
       <div className="container mx-auto px-6 md:px-12">
-        <SectionTitle 
-          title="O Segredo: Terapia de Resultado Breve" 
-          subtitle="Um Novo Mecanismo de Cura"
+        <SectionTitle
+          title="O Segredo: Terapia de Resultado Breve"
         />
 
         {/* Contrast Section */}
@@ -64,7 +63,7 @@ export const Services: React.FC = () => {
         {/* How it works steps */}
         <div className="max-w-5xl mx-auto">
           <h3 className="text-center font-serif text-3xl text-stone-800 mb-12">Como funcionam as sessões?</h3>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             <div className="flex flex-col items-center text-center p-6">
               <div className="w-16 h-16 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mb-6">
