@@ -12,19 +12,40 @@ interface AppointmentFormProps {
 
 export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess, variant = 'default' }) => {
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState<string | null>(null);
 
-  const validatePhone = (phone: string) => {
+  const formatPhoneNumber = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+
+    if (digits.length > 10) {
+      return digits.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+    } else if (digits.length > 5) {
+      return digits.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
+    } else if (digits.length > 2) {
+      return digits.replace(/^(\d{2})(\d{0,5})$/, '($1) $2');
+    } else if (digits.length > 0) {
+      return digits.replace(/^(\d*)/, '($1');
+    }
+    return digits;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setPhone(formatted);
+    setPhoneError(null);
+  };
+
+  const validatePhone = (phoneRaw: string) => {
     // Remove tudo que não é dígito
-    const digits = phone.replace(/\D/g, '');
+    const digits = phoneRaw.replace(/\D/g, '');
 
     // Regras de validação:
     // 10 ou 11 dígitos (DDD + Número) - Padrão BR
-    // 12 ou 13 dígitos começando com 55 (DDI + DDD + Número)
+    // Ignoramos internacional pois o mask é BR
     const isValidLength = digits.length >= 10 && digits.length <= 11;
-    const isValidInternational = (digits.length === 12 || digits.length === 13) && digits.startsWith('55');
 
-    if (isValidLength || isValidInternational) {
+    if (isValidLength) {
       return digits;
     }
     return null;
@@ -47,10 +68,11 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess, var
     setFormState('submitting');
     setPhoneError(null);
 
-    const rawPhone = formData.get('phone') as string;
+    // Usa o state 'phone' que já contém o valor formatado, ou pega do formData
+    // Como é controlado, formData.get('phone') deve ser igual a 'phone'
 
     // Validação de Telefone
-    const phoneDigits = validatePhone(rawPhone);
+    const phoneDigits = validatePhone(phone);
 
     if (!phoneDigits) {
       setPhoneError('Digite um telefone válido com DDD. Ex: (86) 99999-9999');
@@ -60,7 +82,7 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess, var
 
     const data = {
       name: formData.get('name'),
-      phone: rawPhone, // Envia formatado para leitura humana se necessário
+      phone: phone, // Envia formatado para leitura humana
       phone_digits: phoneDigits, // Envia normalizado para automação
       email: formData.get('email'),
       message: formData.get('message'),
@@ -106,7 +128,10 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess, var
           Seus dados foram enviados com sucesso. Entrarei em contato em breve para agendarmos sua <strong>sessão gratuita</strong>.
         </p>
         <button
-          onClick={() => setFormState('idle')}
+          onClick={() => {
+            setFormState('idle');
+            setPhone('');
+          }}
           className="text-primary-600 font-bold underline mt-4 hover:text-primary-800 transition-colors"
         >
           Enviar nova mensagem
@@ -166,9 +191,10 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess, var
           name="phone"
           id="phone"
           required
+          value={phone}
+          onChange={handlePhoneChange}
           className={`w-full px-4 py-3 rounded-lg border focus:ring-4 outline-none transition-all bg-stone-50 focus:bg-white ${phoneError ? 'border-red-500 focus:border-red-500 focus:ring-red-100' : 'border-stone-200 focus:border-primary-500 focus:ring-primary-100'}`}
           placeholder="(DDD) 99999-9999"
-          onChange={() => setPhoneError(null)}
         />
         {phoneError && (
           <p className="text-red-600 text-xs mt-1 flex items-center gap-1">
