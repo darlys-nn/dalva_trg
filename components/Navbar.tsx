@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Phone } from 'lucide-react';
 import { NavItem } from '../types';
-import { useBooking } from '../context/BookingContext';
+
 
 const navItems: NavItem[] = [
   { label: 'O Método', href: '#metodo' },
@@ -13,7 +13,14 @@ const navItems: NavItem[] = [
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { openModal } = useBooking();
+
+
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contato');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,12 +31,11 @@ export const Navbar: React.FC = () => {
   }, []);
 
   return (
-    <nav 
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' 
-          : 'bg-transparent py-5'
-      }`}
+    <nav
+      className={`fixed w-full z-50 transition-all duration-300 ${isScrolled
+        ? 'bg-white/90 backdrop-blur-md shadow-sm py-3'
+        : 'bg-transparent py-5'
+        }`}
     >
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
         {/* Logo */}
@@ -40,7 +46,7 @@ export const Navbar: React.FC = () => {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
-            <a 
+            <a
               key={item.label}
               href={item.href}
               className="text-stone-600 hover:text-primary-700 font-sans text-sm font-medium transition-colors"
@@ -48,8 +54,8 @@ export const Navbar: React.FC = () => {
               {item.label}
             </a>
           ))}
-          <button 
-            onClick={openModal}
+          <button
+            onClick={scrollToContact}
             className="px-5 py-2 bg-primary-600 text-white rounded-full text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm flex items-center gap-2"
           >
             <Phone size={16} />
@@ -58,7 +64,7 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Mobile Toggle */}
-        <button 
+        <button
           className="md:hidden text-stone-700"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
@@ -70,7 +76,7 @@ export const Navbar: React.FC = () => {
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-white border-t border-stone-100 shadow-lg py-6 px-6 flex flex-col gap-4 animate-fade-in">
           {navItems.map((item) => (
-            <a 
+            <a
               key={item.label}
               href={item.href}
               className="text-stone-800 text-lg font-medium py-2 border-b border-stone-100"
@@ -79,10 +85,10 @@ export const Navbar: React.FC = () => {
               {item.label}
             </a>
           ))}
-          <button 
+          <button
             onClick={() => {
               setMobileMenuOpen(false);
-              openModal();
+              scrollToContact();
             }}
             className="mt-2 w-full text-center py-3 bg-primary-600 text-white rounded-lg font-medium"
           >
